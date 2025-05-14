@@ -1,0 +1,235 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Mutation {
+  addPet(input: PetInput): Pet
+  addPetSnapshot(input: PetSnapshotInput): PetSnapshot
+  deletePet(customerId: Int!, uuid: String!): Pet
+  deletePetSnapshot(uuid: String!): PetSnapshot
+  updatePet(input: UpdatePetsInput): Pet
+  updatePetSnapshot(input: UpdatePetSnapshotInput): PetSnapshot
+}
+
+type Pet {
+  accountType: AccountTypes
+  active: Boolean
+  count: Int
+  cphNumber: Int
+  createdAt: AWSDateTime
+  customerId: Int!
+  dob: AWSDate
+  farmGate: Boolean
+  foodChain: Boolean
+  foodUse: [FoodUse]
+  gender: PetGenders
+  healthNotes: String
+  healthy: Boolean
+  medication: Boolean
+  medicationNotes: String
+  name: String
+  passport: String
+  pregnant: Boolean
+  species: Species
+  tags: AWSJSON
+  updatedAt: AWSDateTime
+  uuid: String!
+  weight: Float
+}
+
+type PetSnapshot {
+  accountType: AccountTypes
+  active: Boolean
+  count: Int
+  cphNumber: Int
+  createdAt: AWSDateTime
+  customerId: Int
+  dob: AWSDate
+  farmGate: Boolean
+  foodChain: Boolean
+  foodUse: [FoodUse]
+  gender: PetGenders
+  healthNotes: String
+  healthy: Boolean
+  medication: Boolean
+  medicationNotes: String
+  name: String
+  orderId: Int
+  passport: String
+  petUuid: String!
+  pregnant: Boolean
+  quoteItemId: Int
+  species: Species
+  tags: AWSJSON
+  updatedAt: AWSDateTime
+  uuid: String!
+  weight: Float
+}
+
+type Query {
+  getPet(customerId: Int!, uuid: String!): Pet
+  getPetSnapshot(uuid: String!): PetSnapshot
+  getPets(customerId: Int!): [Pet]
+}
+
+enum AccountTypes {
+  GROUP
+  INDIVIDUAL
+}
+
+enum FoodUse {
+  EGGS
+  MEAT
+  MILK
+  NON_FOOD_USE
+}
+
+enum PetGenders {
+  FEMALE
+  MALE
+  MIXED
+}
+
+enum Species {
+  ALPACA
+  BEARDED_DRAGON
+  BIRD_OF_PREY
+  BUDGERIGAR
+  CANARY
+  CAT
+  CHICKEN
+  CHINCHILLA
+  COCKATIEL
+  COCKATOO
+  COW
+  DEGU
+  DOG
+  DONKEY
+  DUCK
+  FERRET
+  FISH
+  FOX
+  GECKO
+  GERBIL
+  GOAT
+  GOOSE
+  GUINEA_PIG
+  HAMSTER
+  HEDGEHOG
+  HORSE
+  IGUANA
+  LLAMA
+  LOVEBIRD
+  MOUSE
+  PARROT
+  PIG
+  PIGEON
+  RABBIT
+  RAT
+  SHEEP
+  SNAKE
+  SUGAR_GLIDER
+  TORTOISE
+  TURKEY
+}
+
+input PetInput {
+  accountType: AccountTypes
+  active: Boolean
+  count: Int
+  cphNumber: Int
+  customerId: Int!
+  dob: AWSDate
+  farmGate: Boolean
+  foodChain: Boolean
+  foodUse: [FoodUse]
+  gender: PetGenders
+  healthNotes: String
+  healthy: Boolean
+  medication: Boolean
+  medicationNotes: String
+  name: String
+  passport: String
+  pregnant: Boolean
+  species: Species
+  tags: AWSJSON
+  weight: Float
+}
+
+input PetSnapshotInput {
+  accountType: AccountTypes
+  active: Boolean
+  count: Int
+  cphNumber: Int
+  customerId: Int
+  dob: AWSDate
+  farmGate: Boolean
+  foodChain: Boolean
+  foodUse: [FoodUse]
+  gender: PetGenders
+  healthNotes: String
+  healthy: Boolean
+  medication: Boolean
+  medicationNotes: String
+  name: String
+  orderId: Int
+  passport: String
+  petUuid: String!
+  pregnant: Boolean
+  quoteItemId: Int
+  species: Species
+  tags: AWSJSON
+  weight: Float
+}
+
+input UpdatePetSnapshotInput {
+  accountType: AccountTypes
+  active: Boolean
+  count: Int
+  cphNumber: Int
+  customerId: Int
+  dob: AWSDate
+  farmGate: Boolean
+  foodChain: Boolean
+  foodUse: [FoodUse]
+  gender: PetGenders
+  healthNotes: String
+  healthy: Boolean
+  medication: Boolean
+  medicationNotes: String
+  name: String
+  orderId: Int
+  passport: String
+  petUuid: String!
+  pregnant: Boolean
+  quoteItemId: Int
+  species: Species
+  tags: AWSJSON
+  uuid: String!
+  weight: Float
+}
+
+input UpdatePetsInput {
+  accountType: AccountTypes
+  active: Boolean
+  count: Int
+  cphNumber: Int
+  customerId: Int!
+  dob: AWSDate
+  farmGate: Boolean
+  foodChain: Boolean
+  foodUse: [FoodUse]
+  gender: PetGenders
+  healthNotes: String
+  healthy: Boolean
+  medication: Boolean
+  medicationNotes: String
+  name: String
+  passport: String
+  pregnant: Boolean
+  species: Species
+  tags: AWSJSON
+  uuid: String!
+  weight: Float
+}

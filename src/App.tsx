@@ -1,40 +1,48 @@
 import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+import { generateClient } from "aws-amplify/api";
+import { getPets } from './graphql/queries';
+import { Amplify } from 'aws-amplify';
+import config from './aws-exports.js';
 
-const client = generateClient<Schema>();
+Amplify.configure(config);
 
-function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
-  useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
+const client = generateClient();
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
+function PetList() {
+    const [pets, setPets] = useState<any[]>([]);
+    const customerId = 57; // 👈 Replace this with your actual value
 
-  return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </main>
-  );
+    useEffect(() => {
+        const fetchPets = async () => {
+            try {
+                const { data } = await client.graphql({
+                    query: getPets,
+                    variables: { customerId },
+                });
+
+                // If the response is an array:
+                setPets(data.getPets); // Or data.getPets.items if it's an object with items
+            } catch (error) {
+                console.error('Error fetching pets:', error);
+            }
+        };
+
+        fetchPets();
+    }, [customerId]);
+
+    return (
+        <div>
+            <h1>Pets for Customer {customerId}</h1>
+            <ul>
+                {pets.map((pet: any) => (
+                    <li key={pet.uuid}>
+                        <strong>{pet.name}</strong> ({pet.species}) - Weight: {pet.weight}kg
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
-export default App;
+export default PetList;
