@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/api";
 import { getPets } from './graphql/queries';
 import { Amplify } from 'aws-amplify';
-import config from './aws-exports.js';
+import config from './aws-exports.ts';
 
 Amplify.configure(config);
 
