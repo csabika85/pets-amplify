@@ -37,7 +37,7 @@ function PetList() {
             <ul>
                 {pets.map((pet: any) => (
                     <li key={pet.uuid}>
-                        <strong>{pet.name}</strong> ({pet.species}) - Weight: {pet.weight}kg
+                        <strong>{pet.name}</strong> ({pet.species}) - Weight: {pet.weight}kg - Gender: {pet.gender}
                     </li>
                 ))}
             </ul>
