@@ -22,7 +22,7 @@ function PetList() {
                 });
 
                 // If the response is an array:
-                setPets(data.getPets); // Or data.getPets.items if it's an object with items
+                setPets((data.getPets ?? []).filter((p): p is NonNullable<typeof p> => p !== null));
             } catch (error) {
                 console.error('Error fetching pets:', error);
             }
