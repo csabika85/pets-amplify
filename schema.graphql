@@ -3,17 +3,323 @@ schema {
   mutation: Mutation
 }
 
-type Mutation {
-  addPet(input: PetInput): Pet
-  addPetSnapshot(input: PetSnapshotInput): PetSnapshot
-  deletePet(customerId: Int!, uuid: String!): Pet
-  deletePetSnapshot(uuid: String!): PetSnapshot
-  updatePet(input: UpdatePetsInput): Pet
-  updatePetSnapshot(input: UpdatePetSnapshotInput): PetSnapshot
+type AddressOutput {
+  postcode: String
+  street: [String]
 }
 
-type Pet {
-  accountType: AccountTypes
+type CreateLabelMutationResponse @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  details: OrderItem
+  errorMessage: String
+  success: Boolean!
+}
+
+type Customer {
+  email: AWSEmail!
+  firstName: String
+  id: Int!
+  lastName: String
+  pets: [Pet]
+}
+
+type CustomerListOutput {
+  customers: [CustomerSearchOutput]
+  totalCount: Int
+}
+
+type CustomerNote @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  message: String
+  messageId: String
+  updatedAt: AWSDateTime
+  user: String
+}
+
+type CustomerPrescriptionOutput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  approve: [Prescription]
+  assign: [Prescription]
+  assigned: [Prescription]
+  customerAttention: [Prescription]
+  deleted: [Prescription]
+  expired: [Prescription]
+  fraudulent: [Prescription]
+  fulfilled: [Prescription]
+  imageGenerationFailed: [Prescription]
+  merged: [Prescription]
+  vetAttention: [Prescription]
+}
+
+type CustomerSearchOutput {
+  addresses: [AddressOutput]
+  email: AWSEmail
+  firstName: String
+  id: Int
+  lastName: String
+  pets: [Pet]
+}
+
+type DefaultLabel @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  conditional: String
+  delivery: String
+  frequency: String
+  method: String
+  prescriptionText: String
+  prescriptionWarning: String
+  quantity: String
+  specific: String
+  warnings: String
+}
+
+type DeleteNote {
+  createdBy: NullablePmsUser
+  deletedAt: AWSDateTime
+}
+
+type DeleteNoteMutationResponse {
+  details: DeleteNote
+  errorMessage: String
+  success: Boolean!
+}
+
+type Files @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  large: String
+  medium: String
+  original: String
+  small: String
+}
+
+type Label @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID
+  SK: ID
+  conditional: String
+  delivery: String
+  frequency: String
+  method: String
+  petNameAndSpecies: [String]
+  petUuids: [String]
+  pickQty: String
+  prescriptionText: String
+  prescriptionWarning: String
+  quantity: String
+  specific: String
+  warnings: String
+}
+
+type LabelListOutput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  items: [OrderItem]
+}
+
+type ListOrdersByStatusOutput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  items: [Order]
+  nextToken: String
+  totalCount: Int
+}
+
+type Mutation {
+  amendPrescriptionItem(data: AmendPrescriptionItemMutationInput!): MutationResponse!
+  amendPrescriptionValidity(data: AmendPrescriptionValidityInput!): PrescriptionMutationResponse!
+  assignCustomerToPrescription(data: AssignCustomerInput!): MutationResponse!
+  changeOrderStatus(data: ChangeOrderStatusInput!): MutationResponse! @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  createDefaultLabel(data: DefaultLabelInput!): MutationResponse! @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  createFileUploadUrl(imageName: String): UploadUrlResponse!
+  createLabel(data: [LabelInput]!, isApproved: Boolean!, labelsLastUpdatedAt: AWSDateTime, orderItemId: String!, user: PmsUserInput): CreateLabelMutationResponse! @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  createOperatorMessage(data: CreateOperatorMessageInput!): MutationResponse! @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  createPrescriptionItem(data: PrescriptionItemInput!): MutationResponse!
+  createPrescriptionNote(data: CreateNoteInput!): MutationResponse!
+  deleteOrderResendRequest(orderIncrementId: String!, resendRequestSk: String!): MutationResponse!
+  deletePrescriptionItem(data: DeletePrescriptionItemInput!): MutationResponse!
+  deletePrescriptionNote(data: DeleteNoteInput!): DeleteNoteMutationResponse!
+  editLabelAfterApproval(data: [LabelInput]!, labelsLastUpdatedAt: AWSDateTime!, orderItemId: String!, user: PmsUserInput): CreateLabelMutationResponse! @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  mergePrescriptions(data: MergePrescriptionsInput!): MutationResponse!
+  orderResendRequest(data: OrderResendRequestMutationInput): OrderResendRequestMutationResponse!
+  prescription(data: PrescriptionInput!): PrescriptionInputMutationResponse!
+  reassignCustomerOnPrescription(data: AssignCustomerInput!): MutationResponse!
+  regeneratePrescriptionThumbnails(prescriptionId: String!): UpdatePrescriptionImageResponse!
+  removeCustomerFromPrescription(data: RemoveCustomerInput!): MutationResponse!
+  rotatePrescriptionImage(data: RotatePrescriptionImageInput!): UpdatePrescriptionImageResponse!
+  swapPrescriptionItemSku(newProductName: String!, newSku: String!, oldSku: String!, prescriptionId: String!, reason: String!, user: PmsUserInput!): MutationResponse!
+  unmergePrescriptionImage(data: UnMergePrescriptionImageInput!): MutationResponse!
+  updatePrescriptionIssuedByCvsVet(data: issuedByCvsVetInput!): MutationResponse!
+  updatePrescriptionStatus(data: UpdatePrescriptionStatusInput!): MutationResponse!
+  updatePrescriptionValidity(data: UpdatePrescriptionValidityInput!): MutationResponse!
+  updatePrescriptionVmdComplianceReview(data: vmdComplianceReviewInput!): MutationResponse!
+}
+
+type MutationResponse @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  errorMessage: String
+  success: Boolean!
+}
+
+type Note @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID
+  content: String!
+  createdAt: AWSDateTime!
+  createdBy: PmsUser!
+  deletedAt: AWSDateTime
+  deletedBy: PmsUser
+  id: ID
+  updatedAt: AWSDateTime
+  updatedBy: PmsUser
+}
+
+type NullablePmsUser {
+  email: AWSEmail
+  firstName: String
+  lastName: String
+}
+
+type OperatorMessageList @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  addressedTo: String
+  content: String
+  createdAt: AWSDateTime
+  subject: String
+  userName: String
+}
+
+type Order @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID
+  createdAt: AWSDateTime
+  customerEmail: AWSEmail!
+  customerName: String!
+  entityStatus: String
+  heldBy: PmsUser
+  heldOn: AWSDateTime
+  holdReason: String
+  incrementId: String
+  items: [OrderItem]
+  orderComments: [OrderComment]
+  orderResendRequests: [OrderResendDetail]
+  prescriptionAssociations: [OrderPrescriptionAssociation]
+}
+
+type OrderAssignments {
+  canBeFulfilled: Boolean
+  createdAt: String
+  customerId: Int
+  entityStatus: String
+  entityType: String
+  incrementId: String
+  items: [OrderItemAssignments]
+  updatedAt: String
+}
+
+type OrderAssignmentsOutput {
+  errorMessage: String
+  orders: [OrderAssignments]
+}
+
+type OrderComment @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  comment: String
+  createdAt: String
+}
+
+type OrderItem @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: String
+  classification: Classification
+  createdAt: String
+  customerAddressData: PmsOrderCustomerData
+  customerAssignedPetSnapshots: [Pet]
+  customerEmail: AWSEmail
+  customerId: Int
+  customerName: String
+  customerNotes: [CustomerNote]
+  defaultLabel: DefaultLabel
+  entityStatus: String
+  incrementId: String
+  itemId: Int
+  labels: [Label]
+  labelsApprovedAt: AWSDateTime
+  labelsApprovedBy: PmsUser
+  labelsCreatedAt: AWSDateTime
+  labelsCreatedBy: PmsUser
+  labelsUpdatedAt: AWSDateTime
+  labelsUpdatedBy: PmsUser
+  magentoOrderEntityId: Int
+  name: String
+  prescriptionLinks: [Prescription]
+  priority: Boolean
+  qtyOrdered: Int
+  sku: String
+  updatedAt: AWSDateTime
+}
+
+type OrderItemAssignments {
+  assignments: [PrescriptionAssignment]
+  customerAssignedPetSnapshots: [Pet]
+  name: String
+  qtyAssigned: Int
+  qtyOrdered: Int
+  sku: String
+}
+
+type OrderItemAssociation {
+  otherPrescriptionsUsed: [OtherPrescriptions]
+  prescriptionAllocated: Int!
+  prescriptionId: String!
+  prescriptionRefunded: Int
+  sku: String!
+  totalQtyOrdered: Int!
+  totalQtyRefunded: Int
+}
+
+type OrderPrescriptionAssociation {
+  SK: ID!
+  createdAt: String
+  entityType: String
+  items: [PrescriptionOrderAssociationItem]
+  prescription: Prescription
+}
+
+type OrderResendDetail @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID!
+  SK: ID!
+  createdAt: AWSDateTime!
+  createdBy: PmsUser!
+  deletedAt: AWSDateTime!
+  deletedBy: PmsUser
+  entityStatus: OrderResendStatus!
+  items: [ResendItem]
+  newOrderIncrementId: String
+  note: String
+  reasonCode: String
+  updatedAt: AWSDateTime!
+  updatedBy: PmsUser
+}
+
+type OrderResendListDetail @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID!
+  SK: ID!
+  customerName: String
+  entityStatus: String
+  orderDate: AWSDateTime!
+  orderIncrementId: String!
+  orderStatus: String
+}
+
+type OrderResendRequestMutationResponse @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  details: OrderResendResponse
+  errorMessage: String
+  success: Boolean!
+}
+
+type OrderResendResponse {
+  order: Order
+  resendCodes: [ResendCode]
+  stockLevels: [StockLevel]
+}
+
+type OrderToPrescriptionAssociationPrescriptionItem {
+  PK: ID
+  SK: ID
+}
+
+type OtherPrescriptions {
+  prescriptionAllocated: Int!
+  prescriptionId: String!
+  prescriptionRefunded: Int
+}
+
+type Pet @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  accountType: String
   active: Boolean
   count: Int
   cphNumber: Int
@@ -22,8 +328,8 @@ type Pet {
   dob: AWSDate
   farmGate: Boolean
   foodChain: Boolean
-  foodUse: [FoodUse]
-  gender: PetGenders
+  foodUse: [String]
+  gender: String
   healthNotes: String
   healthy: Boolean
   medication: Boolean
@@ -31,205 +337,439 @@ type Pet {
   name: String
   passport: String
   pregnant: Boolean
-  species: Species
+  species: String
   tags: AWSJSON
   updatedAt: AWSDateTime
   uuid: String!
   weight: Float
 }
 
-type PetSnapshot {
-  accountType: AccountTypes
-  active: Boolean
-  count: Int
-  cphNumber: Int
-  createdAt: AWSDateTime
-  customerId: Int
-  dob: AWSDate
-  farmGate: Boolean
-  foodChain: Boolean
-  foodUse: [FoodUse]
-  gender: PetGenders
-  healthNotes: String
-  healthy: Boolean
-  medication: Boolean
-  medicationNotes: String
-  name: String
-  orderId: Int
-  passport: String
-  petUuid: String!
-  pregnant: Boolean
-  quoteItemId: Int
-  species: Species
-  tags: AWSJSON
+type PmsOrderCustomerData @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  city: String
+  firstname: String
+  lastname: String
+  postcode: String
+  street: [String]
+}
+
+type PmsUser @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  email: AWSEmail!
+  firstName: String
+  lastName: String
+}
+
+type Prescription @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID
+  approvedBy: PmsUser
+  approvedOn: AWSDateTime
+  consumedByOrderIds: [String]
+  createdAt: AWSDateTime!
+  customer: Customer
+  files: [Files]
+  id: ID
+  issuedByCvsVet: Boolean
+  items: [PrescriptionItem]
+  lastViewedBy: PmsUser
+  lastViewedOn: AWSDateTime
+  notes: [Note]
+  orderAssociations: [PrescriptionOrderAssociation]
+  orderIncrementId: String
+  status: PrescriptionStatusEnum
   updatedAt: AWSDateTime
-  uuid: String!
-  weight: Float
+  validFrom: AWSDateTime
+  validUntil: AWSDateTime
+  vmdComplianceReview: Boolean
+}
+
+type PrescriptionAssignment {
+  createdAt: String
+  prescriptionId: String
+  productSku: String
+  quantityPrescribed: Int
+  quantityRemaining: Int
+  repeatCount: Int
+}
+
+type PrescriptionInputMutationResponse @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  details: Prescription
+  errorMessage: String
+  success: Boolean!
+}
+
+type PrescriptionItem {
+  createdAt: AWSDateTime!
+  createdBy: PmsUser!
+  productName: String!
+  productSku: String!
+  quantityPrescribed: Int!
+  quantityRemaining: Int!
+  repeatCount: Int!
+  updatedAt: AWSDateTime!
+  updatedBy: PmsUser!
+  validUntil: AWSDate!
+}
+
+type PrescriptionLink @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  expiry: AWSDateTime
+  imageUrl: String
+  prescriptionId: String
+  start: AWSDateTime
+  type: String
+}
+
+#  we use this for list responses
+# so the files field on a prescription cant be accidentally requested. It does not scale well!
+type PrescriptionListItem @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  PK: ID
+  approvedBy: PmsUser
+  approvedOn: AWSDateTime
+  consumedByOrderIds: [String]
+  createdAt: AWSDateTime!
+  customer: Customer
+  id: ID
+  issuedByCvsVet: Boolean
+  items: [PrescriptionItem]
+  lastViewedBy: PmsUser
+  lastViewedOn: AWSDateTime
+  notes: [Note]
+  orderIncrementId: String
+  status: PrescriptionStatusEnum
+  updatedAt: AWSDateTime
+  validFrom: AWSDateTime
+  validUntil: AWSDateTime
+  vmdComplianceReview: Boolean
+}
+
+type PrescriptionListOutput {
+  items: [Prescription]!
+  totalCount: Int!
+}
+
+type PrescriptionListResponse {
+  errorMessage: String
+  items: [PrescriptionListItem]
+  success: Boolean!
+  totalCount: Int
+}
+
+type PrescriptionMutationResponse @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  details: Prescription
+  errorMessage: String
+  success: Boolean!
+}
+
+type PrescriptionOrderAssociation {
+  hasRefund: Boolean!
+  items: [OrderItemAssociation]
+  orderIncrementId: ID!
+  orderStatus: OrderStatus!
+}
+
+type PrescriptionOrderAssociationItem {
+  allocated: Int!
+  prescriptionItem: OrderToPrescriptionAssociationPrescriptionItem
+  refunded: Int
+  sku: String!
+}
+
+type ProductSearchListOutput {
+  items: [ProductSearchOutput]
+  totalCount: Int
+}
+
+type ProductSearchOutput {
+  name: String!
+  sku: String!
 }
 
 type Query {
-  getPet(customerId: Int!, uuid: String!): Pet
-  getPetSnapshot(uuid: String!): PetSnapshot
-  getPets(customerId: Int!): [Pet]
+  assignPrescriptionsToOrdersDryRun(prescriptionId: ID!): OrderAssignmentsOutput
+  customerPrescriptions(customerId: ID!): CustomerPrescriptionOutput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  customerSearch(email: String, lastName: String): CustomerListOutput
+  getDefaultLabel(sku: String!): DefaultLabel @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  labelListData(limit: Int, listType: ListType, nextToken: String): LabelListOutput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  listOrdersByStatus(status: OrderStatus!): ListOrdersByStatusOutput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  operatorMessageList(orderItemPk: String!): [OperatorMessageList] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  orderCommentsList(magentoEntityId: Int!): [OrderComment] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  orderItemLabelData(PK: ID!): OrderItem @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  orderResendRequestList(orderResendStatus: OrderResendStatus!): [OrderResendListDetail] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  prescriptionNotes(prescriptionPk: String!): [Note] @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  prescriptionsList(status: PrescriptionStatusEnum!): PrescriptionListResponse @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
+  productSearch(searchString: String): ProductSearchListOutput
+  searchOrderId(orderId: String!): Order @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"])
 }
 
-enum AccountTypes {
-  GROUP
-  INDIVIDUAL
+type ResendCode {
+  code: String!
+  description: String
+  name: String!
 }
 
-enum FoodUse {
-  EGGS
-  MEAT
-  MILK
-  NON_FOOD_USE
+type ResendItem @aws_api_key {
+  qty: Int!
+  sku: String!
 }
 
-enum PetGenders {
-  FEMALE
-  MALE
-  MIXED
+type StockLevel {
+  availableQty: Int
+  sku: String
 }
 
-enum Species {
-  ALPACA
-  BEARDED_DRAGON
-  BIRD_OF_PREY
-  BUDGERIGAR
-  CANARY
-  CAT
-  CHICKEN
-  CHINCHILLA
-  COCKATIEL
-  COCKATOO
-  COW
-  DEGU
-  DOG
-  DONKEY
-  DUCK
-  FERRET
-  FISH
-  FOX
-  GECKO
-  GERBIL
-  GOAT
-  GOOSE
-  GUINEA_PIG
-  HAMSTER
-  HEDGEHOG
-  HORSE
-  IGUANA
-  LLAMA
-  LOVEBIRD
-  MOUSE
-  PARROT
-  PIG
-  PIGEON
-  RABBIT
-  RAT
-  SHEEP
-  SNAKE
-  SUGAR_GLIDER
-  TORTOISE
-  TURKEY
+type UpdatePrescriptionImageResponse {
+  errorMessage: String
+  files: [Files]
+  success: Boolean!
 }
 
-input PetInput {
-  accountType: AccountTypes
-  active: Boolean
-  count: Int
-  cphNumber: Int
-  customerId: Int!
-  dob: AWSDate
-  farmGate: Boolean
-  foodChain: Boolean
-  foodUse: [FoodUse]
-  gender: PetGenders
-  healthNotes: String
-  healthy: Boolean
-  medication: Boolean
-  medicationNotes: String
-  name: String
-  passport: String
-  pregnant: Boolean
-  species: Species
-  tags: AWSJSON
-  weight: Float
+type UploadUrlResponse {
+  url: String!
 }
 
-input PetSnapshotInput {
-  accountType: AccountTypes
-  active: Boolean
-  count: Int
-  cphNumber: Int
-  customerId: Int
-  dob: AWSDate
-  farmGate: Boolean
-  foodChain: Boolean
-  foodUse: [FoodUse]
-  gender: PetGenders
-  healthNotes: String
-  healthy: Boolean
-  medication: Boolean
-  medicationNotes: String
-  name: String
-  orderId: Int
-  passport: String
-  petUuid: String!
-  pregnant: Boolean
-  quoteItemId: Int
-  species: Species
-  tags: AWSJSON
-  weight: Float
+enum Classification {
+  PET_REG_REQUIRED
+  PRESCRIPTION_REQUIRED
 }
 
-input UpdatePetSnapshotInput {
-  accountType: AccountTypes
-  active: Boolean
-  count: Int
-  cphNumber: Int
-  customerId: Int
-  dob: AWSDate
-  farmGate: Boolean
-  foodChain: Boolean
-  foodUse: [FoodUse]
-  gender: PetGenders
-  healthNotes: String
-  healthy: Boolean
-  medication: Boolean
-  medicationNotes: String
-  name: String
-  orderId: Int
-  passport: String
-  petUuid: String!
-  pregnant: Boolean
-  quoteItemId: Int
-  species: Species
-  tags: AWSJSON
-  uuid: String!
-  weight: Float
+enum ListType {
+  NFA
+  PRESCRIPTION
+  SQPQUERY
+  VETATTENTION
 }
 
-input UpdatePetsInput {
-  accountType: AccountTypes
-  active: Boolean
-  count: Int
-  cphNumber: Int
-  customerId: Int!
-  dob: AWSDate
-  farmGate: Boolean
-  foodChain: Boolean
-  foodUse: [FoodUse]
-  gender: PetGenders
-  healthNotes: String
-  healthy: Boolean
-  medication: Boolean
-  medicationNotes: String
-  name: String
-  passport: String
-  pregnant: Boolean
-  species: Species
-  tags: AWSJSON
-  uuid: String!
-  weight: Float
+enum OperatorMessageOrderItemStatusInputEnum {
+  LABELS_CREATED
+  PENDING_LABELS
+  SQP_QUERY
+  VET_ATTENTION
+}
+
+enum OrderItemStatusEnum {
+  LABELS_CREATED
+  PENDING_LABELS
+  PENDING_PRESCRIPTION
+  PROCESSING
+  SENT_TO_OMS
+  SHIPPED
+  SQP_QUERY
+  VET_ATTENTION
+}
+
+enum OrderResendStatus {
+  COMPLETE
+  DELETED
+  OPEN
+}
+
+enum OrderStatus {
+  CANCELLED
+  LABELS_CREATED
+  ON_HOLD
+  PENDING_LABELS
+  PENDING_PRESCRIPTION_APPROVAL
+  PROCESSING
+  SENT_TO_OMS
+  SHIPPED
+}
+
+enum OrderStatusChangeEnum {
+  ON_HOLD
+  PENDING_PRESCRIPTION_APPROVAL
+}
+
+enum PrescriptionStatusEnum {
+  APPROVE
+  ASSIGN
+  ASSIGNED
+  CUSTOMER_ATTENTION
+  DELETED
+  EXPIRED
+  FRAUDULENT
+  FULFILLED
+  MERGED
+  VET_ATTENTION
+}
+
+input AmendPrescriptionItemMutationInput {
+  amendmentReason: String!
+  prescriptionId: ID!
+  quantityPrescribed: Int!
+  repeatCount: Int!
+  sku: ID!
+  user: PmsUserInput!
+  validUntil: AWSDate!
+}
+
+input AmendPrescriptionValidityInput {
+  prescriptionId: ID!
+  reason: String!
+  user: PmsUserInput!
+  validFrom: AWSDateTime!
+  validUntil: AWSDateTime!
+}
+
+input AssignCustomerInput {
+  customer: CustomerInput!
+  prescriptionId: ID!
+  user: PmsUserInput!
+}
+
+input ChangeOrderStatusInput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  incrementId: String!
+  notes: String!
+  status: OrderStatusChangeEnum!
+  user: PmsUserInput!
+}
+
+input CreateNoteInput {
+  content: String!
+  prescriptionId: ID!
+  user: PmsUserInput!
+}
+
+input CreateOperatorMessageInput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  addressedTo: String!
+  classification: Classification!
+  content: String!
+  newOrderItemStatus: OperatorMessageOrderItemStatusInputEnum
+  orderItemPk: ID!
+  sku: String!
+  subject: String!
+  userName: String!
+}
+
+input CustomerInput {
+  email: AWSEmail!
+  firstName: String!
+  id: Int!
+  lastName: String!
+}
+
+input DefaultLabelInput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  conditional: String
+  delivery: String
+  frequency: String
+  method: String
+  prescriptionText: String
+  prescriptionWarning: String
+  quantity: String
+  sku: String!
+  specific: String
+  warnings: String
+}
+
+input DeleteNoteInput {
+  noteId: ID!
+  prescriptionId: ID!
+  user: PmsUserInput!
+}
+
+input DeletePrescriptionItemInput {
+  itemSku: String!
+  prescriptionId: ID!
+  reason: String
+  user: PmsUserInput
+}
+
+input LabelInput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  conditional: String
+  delivery: String
+  frequency: String
+  method: String
+  petNameAndSpecies: [String]!
+  petUuids: [String]!
+  pickQty: Int
+  prescriptionText: String
+  prescriptionWarning: String
+  quantity: String
+  specific: String
+  warnings: String
+}
+
+input MergePrescriptionsInput {
+  sourcePrescriptionId: ID!
+  targetPrescriptionId: ID!
+  user: PmsUserInput!
+}
+
+input OrderResendInput @aws_api_key {
+  items: [ResendItemInput]
+  note: String
+  reasonCode: ID
+}
+
+input OrderResendRequestMutationInput {
+  orderIncrementId: ID!
+  orderResend: OrderResendInput
+  submit: Boolean
+  user: PmsUserInput!
+}
+
+input PmsUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+}
+
+input PrescriptionInput @aws_api_key @aws_cognito_user_pools(cognito_groups : ["PMSLabelling"]) {
+  id: ID!
+  user: PmsUserInput!
+}
+
+input PrescriptionItemInput {
+  prescriptionId: String!
+  productName: String!
+  productSku: String!
+  quantityPrescribed: Int!
+  reason: String
+  repeatCount: Int!
+  user: PmsUserInput!
+  validUntil: AWSDate!
+}
+
+input RemoveCustomerInput {
+  prescriptionId: ID!
+  user: PmsUserInput!
+}
+
+input ResendItemInput @aws_api_key {
+  qty: Int!
+  sku: String!
+}
+
+input RotatePrescriptionImageInput {
+  degrees: Int!
+  fileIndex: Int!
+  prescriptionId: ID!
+}
+
+input UnMergePrescriptionImageInput {
+  fileIndex: Int!
+  prescriptionId: ID!
+  user: PmsUserInput!
+}
+
+input UpdatePrescriptionStatusInput {
+  prescriptionId: ID!
+  status: PrescriptionStatusEnum!
+  user: PmsUserInput!
+}
+
+input UpdatePrescriptionValidityInput {
+  prescriptionId: ID!
+  user: PmsUserInput!
+  validFrom: AWSDateTime!
+  validUntil: AWSDateTime!
+}
+
+input issuedByCvsVetInput {
+  issuedByCvsVet: Boolean!
+  prescriptionId: String!
+  user: PmsUserInput!
+}
+
+input vmdComplianceReviewInput {
+  prescriptionId: String!
+  user: PmsUserInput!
+  vmdComplianceReview: Boolean!
 }
